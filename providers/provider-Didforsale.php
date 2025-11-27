@@ -21,6 +21,15 @@ class Didforsale extends providerBase
                 'required'    => true, 
                 'placeholder' => _('Enter your DIDforsale API Key'),
             ),
+            'api_secret' => array(
+                'type'        => 'string', 
+                'label'       => _('Access Token'),
+                'help'        => _("Your DIDforsale Access Token (for API v4.0+)."),
+                'default'     => '',
+                'class'       => 'confidential',
+                'required'    => true, 
+                'placeholder' => _('Enter your DIDforsale Access Token'),
+            ),
         );
     }
      
@@ -35,7 +44,7 @@ class Didforsale extends providerBase
     {
         $config = $this->getConfig($this->nameRaw);
         
-        if (empty($config['apikey'])) {
+        if (empty($config['apikey']) || empty($config['api_secret'])) {
             return false;
         }
 
@@ -45,6 +54,7 @@ class Didforsale extends providerBase
         // Prepare Data
         $data = array(
             'apikey' => $config['apikey'],
+            'accesstoken' => $config['api_secret'],
             'from'   => $from,
             'to'     => $to,
             'text'   => $message
