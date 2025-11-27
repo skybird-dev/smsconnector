@@ -51,10 +51,8 @@ class Didforsale extends providerBase
         // DIDforsale API Endpoint (V4 supports JSON with media_urls parameter)
         $url = 'https://api.didforsale.com/didforsaleapi/index.php/api/V4/SMS/Send';
 
-        // Prepare Data
+        // Prepare Data - SMS parameters in body
         $data = array(
-            'apikey' => $config['apikey'],
-            'accesstoken' => $config['api_secret'],
             'from'   => $from,
             'to'     => $to,
             'text'   => $message
@@ -68,12 +66,19 @@ class Didforsale extends providerBase
             }
         }
 
-        // Send Request via CURL with JSON body
+        // DIDforsale API v4.0 requires authentication via HTTP headers
+        $headers = array(
+            'Content-Type: application/json',
+            'APIKEY: ' . $config['apikey'],
+            'accesstoken: ' . $config['api_secret']
+        );
+
+        // Send Request via CURL with JSON body and auth headers
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         
