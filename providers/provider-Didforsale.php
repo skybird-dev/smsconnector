@@ -96,10 +96,11 @@ class Didforsale extends providerBase
 
     public function callPublic($connector)
     {
-        // DIDforsale sends parameters via GET or POST (usually GET for the URL forwarding)
+        // DIDforsale sends parameters via GET or POST (usually POST)
         // Parameters are: 'from', 'to', 'text'
         
         $request = $_REQUEST;
+        $return_code = 200;
 
         if (isset($request['from']) && isset($request['to']) && isset($request['text'])) {
             
@@ -107,16 +108,24 @@ class Didforsale extends providerBase
             $to      = $request['to'];
             $message = $request['text'];
 
-            // Pass to SMS Connector
-            // receiveMessage($did, $from, $message)
-            $this->receiveMessage($to, $from, $message);
-            
-            // Return success code to DIDforsale so they don't retry
-            return 200;
+            freepbx_log(FPBX_LOG_INFO, sprintf(_("Webhook (%s) in: from=%s, to=%s, text=%s"), $this->nameRaw, $from, $to, $message));
+
+            try {
+                // Store inbound message to database and get message ID
+                $msgid = $connector->getMessage($to, $from, '', $message, null, null, null);
+
+                // Emit event to notify FreePBX system and connected modules (UCP, dialplan, etc.)
+                $connector->emitSmsInboundUserEvt($msgid, $to, $from, '', $message, null, 'Smsconnector', null);
+
+                freepbx_log(FPBX_LOG_INFO, sprintf(_("Webhook (%s): SMS received and processed (msgid=%s)"), $this->nameRaw, $msgid));
+                $return_code = 200;
+            } catch (\Exception $e) {
+                freepbx_log(FPBX_LOG_INFO, sprintf(_("Webhook (%s): Error processing SMS: %s"), $this->nameRaw, $e->getMessage()));
+                $return_code = 500;
+            }
         }
 
-        // If we are here, it might be a status callback (initiated, ringing, etc)
-        // We return 200 to acknowledge receipt and stop retries, even if we don't process it.
-        return 200;
+        // Return response code to DIDforsale so they know if we processed it
+        return $return_code;
     }
 }
