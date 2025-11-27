@@ -8,6 +8,8 @@ class Didforsale extends providerBase
         parent::__construct();
         $this->name     = _('DIDforsale');
         $this->nameRaw  = 'didforsale';
+        $this->APIUrlInfo = 'https://myapi.didforsale.com/documentation/';
+        $this->APIVersion = 'V4';
 
         $this->configInfo = array(
             'apikey' => array(
