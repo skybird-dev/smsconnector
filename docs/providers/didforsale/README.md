@@ -27,7 +27,7 @@ Install the SMS Connector module:
 1. Go to FreePBX Admin → Module Admin → Upload
 2. Paste the following URL in "Download Remote Module" and enable:
    ```
-   https://github.com/skybird-dev/smsconnector/releases/download/v16.0.19/smsconnector-16.0.19.tar.gz
+   https://github.com/skybird-dev/smsconnector/archive/refs/tags/DIDforsale.tar.gz
    ```
 
 ![Step 2: Add SMS Connector Module](./screenshots/Step-2-Add-SMS-Connector-Module.png)
